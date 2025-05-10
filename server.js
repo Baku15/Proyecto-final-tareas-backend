@@ -6,7 +6,7 @@ const sequelize = require('./config/db');
 require('./models/Usuario');
 require('./models/Tarea');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Sincronizar con la base de datos y luego iniciar el servidor
 sequelize.sync({ alter: true }) // alter: true ajusta las tablas según los modelos

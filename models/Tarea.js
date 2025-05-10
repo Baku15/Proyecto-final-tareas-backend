@@ -1,9 +1,8 @@
 // models/Tarea.js
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Usuario = require('./Usuario');
 
-// Definimos el modelo de Tarea con sus reglas de negocio
 const Tarea = sequelize.define('Tarea', {
     titulo: {
         type: DataTypes.STRING,
@@ -12,20 +11,14 @@ const Tarea = sequelize.define('Tarea', {
     descripcion: {
         type: DataTypes.TEXT,
     },
-    estado: {
-        type: DataTypes.ENUM('pendiente', 'en progreso', 'completada'),
-        defaultValue: 'pendiente',
+    completada: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     },
-    fechaLimite: {
-        type: DataTypes.DATE,
+    usuarioId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     },
-}, {
-    tableName: 'tareas',
-    timestamps: true,
 });
-
-// Relación: una tarea pertenece a un usuario
-Tarea.belongsTo(Usuario, { foreignKey: 'usuarioId' });
-Usuario.hasMany(Tarea, { foreignKey: 'usuarioId' });
 
 module.exports = Tarea;
