@@ -1,11 +1,11 @@
-// middlewares/autenticarJWT.js
+// middlewares/verificarToken.js
 
 const jwt = require('jsonwebtoken');
 
 /**
  * Middleware para proteger rutas con autenticación JWT
  */
-const autenticarJWT = (req, res, next) => {
+const verificarToken = (req, res, next) => {
     const token = req.headers['authorization'];
 
     if (!token) {
@@ -22,4 +22,4 @@ const autenticarJWT = (req, res, next) => {
     }
 };
 
-module.exports = autenticarJWT;
+module.exports = verificarToken;

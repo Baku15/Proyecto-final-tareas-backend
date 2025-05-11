@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const autenticarJWT = require('../middlewares/autenticarJWT');
+const autenticarJWT = require('../middlewares/verificarToken');
 const {
     crearTarea,
     obtenerTareas,

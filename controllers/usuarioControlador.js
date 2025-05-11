@@ -67,7 +67,20 @@ const iniciarSesion = async (req, res) => {
     }
 };
 
+const obtenerUsuario = async (req, res) => {
+    try {
+        const usuario = await Usuario.findByPk(req.usuario.id, {
+            attributes: ['id', 'nombre', 'email']
+        });
+        res.json(usuario);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al obtener usuario.', error });
+    }
+};
+
+
 module.exports = {
     registrarUsuario,
     iniciarSesion,
+    obtenerUsuario,
 };
