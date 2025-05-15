@@ -6,15 +6,9 @@ const rutasTarea = require("./routes/tareaRutas");
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // <- Asegúrate de tener esto
+app.use(express.json());
 
-// Rutas
-app.use("/api/usuarios", rutasUsuario);
-app.use("/api/tareas", rutasTarea);
+app.use("/api/auth", rutasUsuario);
+app.use("/api/tasks", rutasTarea);
 
-// Puerto
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
-module.exports = app;
+module.exports = app; // Exportar solo la app, sin iniciar el servidor aquí

@@ -1,21 +1,16 @@
-// server.js
 const app = require('./app');
-const sequelize = require('./config/db');
-
-// Importar modelos para que se sincronicen
-require('./models/Usuario');
-require('./models/Tarea');
+const db = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
 
-// Sincronizar con la base de datos y luego iniciar el servidor
-sequelize.sync({ alter: true }) // alter: true ajusta las tablas según los modelos
+db.sync({ force: true }) // Si realmente necesitas recrear la base de datos cada vez, esta opción es válida. Sino, cambia a `{ alter: true }`.
     .then(() => {
-        console.log('🔗 Conectado a PostgreSQL con Sequelize');
+        console.log('✅ Base de datos recreada.');
+
         app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
         });
     })
     .catch((err) => {
-        console.error('❌ Error al conectar con la base de datos:', err);
+        console.error('❌ Error al sincronizar la base de datos:', err);
     });

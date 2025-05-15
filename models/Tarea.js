@@ -1,24 +1,29 @@
-// models/Tarea.js
-
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Tarea = sequelize.define('Tarea', {
-    titulo: {
+    title: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    descripcion: {
+    description: {
         type: DataTypes.TEXT,
     },
-    completada: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+    status: {
+        type: DataTypes.ENUM('pendiente', 'completada'),
+        defaultValue: 'pendiente',
+    },
+    dueDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true, // Puedes poner false si es obligatorio
     },
     usuarioId: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+}, {
+    tableName: 'tareas',
+    timestamps: true,
 });
 
 module.exports = Tarea;

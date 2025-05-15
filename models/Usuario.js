@@ -1,19 +1,17 @@
-// models/Usuario.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-// Definimos el modelo de Usuario con Sequelize
 const Usuario = sequelize.define('Usuario', {
-    nombre: {
+    name: {                      // ← en inglés
         type: DataTypes.STRING,
         allowNull: false,
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true, // No se pueden repetir correos
+        unique: true,
     },
-    contrasena: {
+    password: {                 // ← en inglés
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -23,3 +21,4 @@ const Usuario = sequelize.define('Usuario', {
 });
 
 module.exports = Usuario;
+

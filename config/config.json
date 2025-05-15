@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "breick1010",
+    "database": "backend-final",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "breick1010",
+    "database": "backend-final",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "breick1010",
+    "database": "backend-final",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

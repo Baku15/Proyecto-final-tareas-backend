@@ -9,7 +9,15 @@ const jwt = require('jsonwebtoken');
  */
 const registrarUsuario = async (req, res) => {
     try {
-        const { nombre, email, contrasena } = req.body;
+        // Esto mostrará lo que llega en el cuerpo de la solicitud
+        console.log('Datos recibidos en el registro:', req.body);
+
+        const { name, email, password } = req.body;
+
+        // Verificamos si los campos son válidos
+        if (!name || !email || !password) {
+            return res.status(400).json({ mensaje: 'Todos los campos son obligatorios.' });
+        }
 
         // Verificamos si el usuario ya existe
         const existeUsuario = await Usuario.findOne({ where: { email } });
@@ -18,18 +26,19 @@ const registrarUsuario = async (req, res) => {
         }
 
         // Encriptamos la contraseña
-        const contrasenaHash = await bcrypt.hash(contrasena, 10);
+        const passwordHash = await bcrypt.hash(password, 10);
 
         // Creamos el nuevo usuario
         const nuevoUsuario = await Usuario.create({
-            nombre,
+            name,
             email,
-            contrasena: contrasenaHash,
+            password: passwordHash,
         });
 
         res.status(201).json({ mensaje: 'Usuario registrado correctamente.' });
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error al registrar usuario.', error });
+        console.error('Error en el registro:', error.message);  // Muestra el mensaje de error en consola
+        res.status(500).json({ mensaje: 'Error al registrar usuario.', error: error.message });
     }
 };
 
@@ -38,7 +47,7 @@ const registrarUsuario = async (req, res) => {
  */
 const iniciarSesion = async (req, res) => {
     try {
-        const { email, contrasena } = req.body;
+        const { email, password } = req.body;
 
         // Verificamos si el usuario existe
         const usuario = await Usuario.findOne({ where: { email } });
@@ -47,20 +56,20 @@ const iniciarSesion = async (req, res) => {
         }
 
         // Verificamos la contraseña
-        const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena);
-        if (!contrasenaValida) {
+        const passwordValida = await bcrypt.compare(password, usuario.password);
+        if (!passwordValida) {
             return res.status(401).json({ mensaje: 'Contraseña incorrecta.' });
         }
 
         // Creamos el token JWT
-        const token = jwt.sign({ id: usuario.id, nombre: usuario.nombre }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ id: usuario.id, name: usuario.name }, process.env.JWT_SECRET, {
             expiresIn: '2h',
         });
 
         res.json({
             mensaje: 'Inicio de sesión exitoso.',
             token,
-            usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email },
+            usuario: { id: usuario.id, name: usuario.name, email: usuario.email },
         });
     } catch (error) {
         res.status(500).json({ mensaje: 'Error al iniciar sesión.', error });
@@ -70,7 +79,7 @@ const iniciarSesion = async (req, res) => {
 const obtenerUsuario = async (req, res) => {
     try {
         const usuario = await Usuario.findByPk(req.usuario.id, {
-            attributes: ['id', 'nombre', 'email']
+            attributes: ['id', 'name', 'email']
         });
         res.json(usuario);
     } catch (error) {

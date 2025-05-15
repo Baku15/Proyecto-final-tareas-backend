@@ -6,7 +6,7 @@ const { registrarUsuario, iniciarSesion, obtenerUsuario } = require('../controll
 const verificarToken = require('../middlewares/verificarToken');
 
 // Ruta para registrar un nuevo usuario
-router.post('/registro', registrarUsuario);
+router.post('/register', registrarUsuario);
 
 // Ruta para iniciar sesión
 router.post('/login', iniciarSesion);
