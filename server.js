@@ -3,9 +3,9 @@ const db = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
 
-db.sync({ force: true }) // Si realmente necesitas recrear la base de datos cada vez, esta opción es válida. Sino, cambia a `{ alter: true }`.
+db.sync({ alter: true })  // Ajusta tablas para que coincidan con los modelos sin borrar datos
     .then(() => {
-        console.log('✅ Base de datos recreada.');
+        console.log('✅ Base de datos sincronizada correctamente.');
 
         app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

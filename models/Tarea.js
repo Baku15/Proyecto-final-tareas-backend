@@ -22,7 +22,7 @@ const Tarea = sequelize.define('Tarea', {
         allowNull: false,
     },
 }, {
-    tableName: 'tareas',
+    tableName: 'tasks',
     timestamps: true,
 });
 

@@ -1,5 +1,4 @@
-// controllers/tareaControlador.js
-
+const { Op } = require('sequelize');
 const Tarea = require('../models/Tarea');
 
 /**
@@ -9,12 +8,26 @@ const crearTarea = async (req, res) => {
     try {
         const { title, description, status, dueDate } = req.body;
 
+        // Validar que dueDate no sea una fecha pasada
+        if (dueDate) {
+            const fechaActual = new Date();
+            const fechaTarea = new Date(dueDate);
+
+            // Ajustar la hora para comparar solo la fecha, ignorando horas/minutos/segundos
+            fechaActual.setHours(0, 0, 0, 0);
+            fechaTarea.setHours(0, 0, 0, 0);
+
+            if (fechaTarea < fechaActual) {
+                return res.status(400).json({ mensaje: 'La fecha de vencimiento no puede ser anterior a hoy.' });
+            }
+        }
+
         const nuevaTarea = await Tarea.create({
             title,
             description,
-            status,         // debe ser 'pendiente' o 'completada'
-            dueDate,        // formato YYYY-MM-DD
-            usuarioId: req.usuario.id, // ID extraído del token
+            status,
+            dueDate,
+            usuarioId: req.usuario.id,
         });
 
         res.status(201).json(nuevaTarea);
@@ -29,9 +42,25 @@ const crearTarea = async (req, res) => {
  */
 const obtenerTareas = async (req, res) => {
     try {
+        const usuarioId = req.usuario.id;
+        const orden = req.query.orden;  // Recibimos el parámetro orden (opcional)
+
+        // Orden por defecto
+        let ordenamiento = [['createdAt', 'DESC']];
+
+        if (orden) {
+            if (orden.toLowerCase() === 'antiguos') {
+                ordenamiento = [['createdAt', 'ASC']];
+            } else if (orden.toLowerCase() === 'recientes') {
+                ordenamiento = [['createdAt', 'DESC']];
+            }
+        }
+
+        console.log('Orden aplicado en obtenerTareas:', ordenamiento);
+
         const tareas = await Tarea.findAll({
-            where: { usuarioId: req.usuario.id },
-            order: [['createdAt', 'DESC']],
+            where: { usuarioId },
+            order: ordenamiento,
         });
 
         res.json(tareas);
@@ -91,9 +120,114 @@ const eliminarTarea = async (req, res) => {
     }
 };
 
+/**
+ * Buscar tareas por texto (título o descripción)
+ */
+const buscarTareas = async (req, res) => {
+    const query = req.query.query?.toLowerCase();
+    const usuarioId = req.usuario.id;
+
+    try {
+        const tareas = await Tarea.findAll({
+            where: {
+                usuarioId,
+                [Op.or]: [
+                    { title: { [Op.iLike]: `%${query}%` } },
+                    { description: { [Op.iLike]: `%${query}%` } }
+                ]
+            }
+        });
+
+        res.json(tareas);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al buscar tareas', error });
+    }
+};
+
+/**
+ * Filtrar tareas por estado
+ */
+const filtrarTareasPorEstado = async (req, res) => {
+    const status = req.query.status;
+    const usuarioId = req.usuario.id;
+
+    try {
+        const tareas = await Tarea.findAll({
+            where: {
+                usuarioId,
+                status
+            }
+        });
+
+        res.json(tareas);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al filtrar tareas', error });
+    }
+};
+
+/**
+ * Filtrar tareas por múltiples parámetros: título, estado, fecha, orden, rango fechas
+ */
+
+
+const filtrarTareasAvanzado = async (req, res) => {
+    try {
+        const { title, status, orden, fechaInicio, fechaFin } = req.query;
+        const usuarioId = req.usuario.id;
+
+        const filtros = { usuarioId };
+
+        // Filtrar por título (busqueda parcial)
+        if (title) {
+            filtros.title = { [Op.iLike]: `%${title}%` };
+        }
+
+        // Filtrar por estado
+        if (status) {
+            filtros.status = status;
+        }
+
+        // Filtrar por rango de fecha de creación
+        if (fechaInicio && fechaFin) {
+            filtros.dueDate = {
+                [Op.between]: [new Date(fechaInicio), new Date(fechaFin)]
+            };
+        }
+
+        // Ordenar por fecha de creación
+        let ordenamiento = [['createdAt', 'DESC']];
+        if (orden) {
+            if (orden.toLowerCase() === 'recientes') {
+                ordenamiento = [['createdAt', 'DESC']];
+            } else if (orden.toLowerCase() === 'antiguos') {
+                ordenamiento = [['createdAt', 'ASC']];
+            }
+        }
+
+        console.log('Filtros usados:', filtros);
+        console.log('Orden aplicado:', ordenamiento);
+
+        const tareas = await Tarea.findAll({
+            where: filtros,
+            order: ordenamiento,
+        });
+
+        res.json(tareas);
+    } catch (error) {
+        console.error('Error al filtrar tareas:', error);
+        res.status(500).json({
+            mensaje: 'Error al filtrar tareas',
+            error: error.message,
+        });
+    }
+};
+
 module.exports = {
     crearTarea,
     obtenerTareas,
     actualizarTarea,
     eliminarTarea,
+    buscarTareas,
+    filtrarTareasPorEstado,
+    filtrarTareasAvanzado,
 };
