@@ -56,6 +56,19 @@ const obtenerTareas = async (req, res) => {
             }
         }
 
+        // Filtro por dueDate exacto (formato yyyy-mm-dd)
+        if (dueDate) {
+            const startOfDay = new Date(dueDate);
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const endOfDay = new Date(dueDate);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            filtros.dueDate = {
+                [Op.between]: [startOfDay, endOfDay]
+            };
+        }
+
         console.log('Orden aplicado en obtenerTareas:', ordenamiento);
 
         const tareas = await Tarea.findAll({
