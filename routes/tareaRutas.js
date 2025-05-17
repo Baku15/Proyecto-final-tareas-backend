@@ -4,6 +4,7 @@ const express = require('express');
 const verificarToken = require('../middlewares/verificarToken');
 const tareaControlador = require('../controllers/tareaControlador');
 
+
 const router = express.Router();
 const autenticarJWT = require('../middlewares/verificarToken');
 const {
@@ -22,12 +23,6 @@ router.post('/', crearTarea);
 // Obtener todas las tareas del usuario
 router.get('/', obtenerTareas);
 
-// Actualizar tarea
-router.put('/:id', actualizarTarea);
-
-// Eliminar tarea
-router.delete('/:id', eliminarTarea);
-
 // Buscar por título o descripción (?query=...)
 router.get('/search', verificarToken, tareaControlador.buscarTareas);
 
@@ -37,5 +32,13 @@ router.get('/filter-by-status', verificarToken, tareaControlador.filtrarTareasPo
 // Filtrado avanzado (título, estado, fecha) (?title=..., status=..., dueDate=...)
 router.get('/filter', verificarToken, tareaControlador.filtrarTareasAvanzado);
 
+// Obtener una tarea en específico (DEBE ir después de las otras rutas GET)
+router.get('/:id', verificarToken, tareaControlador.obtenerTareaPorId);
+
+// Actualizar tarea (también con :id, por eso abajo)
+router.put('/:id', actualizarTarea);
+
+// Eliminar tarea por ID
+router.delete('/:id', eliminarTarea);
 
 module.exports = router;

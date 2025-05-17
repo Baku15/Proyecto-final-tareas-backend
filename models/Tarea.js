@@ -26,4 +26,11 @@ const Tarea = sequelize.define('Tarea', {
     timestamps: true,
 });
 
+Tarea.associate = function (models) {
+    Tarea.belongsTo(models.Usuario, {
+        foreignKey: 'usuarioId',
+        as: 'usuario',
+    });
+};
+
 module.exports = Tarea;

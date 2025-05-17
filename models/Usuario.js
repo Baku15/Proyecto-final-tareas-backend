@@ -20,5 +20,12 @@ const Usuario = sequelize.define('Usuario', {
     timestamps: true,
 });
 
+Usuario.associate = function (models) {
+    Usuario.hasMany(models.Tarea, {
+        foreignKey: 'usuarioId',
+        as: 'tareas',
+        onDelete: 'CASCADE',
+    });
+};
 module.exports = Usuario;
 

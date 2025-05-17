@@ -41,11 +41,14 @@ const crearTarea = async (req, res) => {
  * Obtener todas las tareas del usuario autenticado
  */
 const obtenerTareas = async (req, res) => {
-    try {
-        const usuarioId = req.usuario.id;
-        const orden = req.query.orden;  // Recibimos el parámetro orden (opcional)
 
-        // Orden por defecto
+    try {
+        const usuarioId = req.usuario.id;  // <-- aquí se define
+        const orden = req.query.orden;
+        const dueDate = req.query.dueDate; // ✅ Extraer dueDate
+        const filtros = { usuarioId };     // ✅ Inicializar filtros
+
+// Orden por defecto
         let ordenamiento = [['createdAt', 'DESC']];
 
         if (orden) {
@@ -56,7 +59,8 @@ const obtenerTareas = async (req, res) => {
             }
         }
 
-        // Filtro por dueDate exacto (formato yyyy-mm-dd)
+
+// ✅ Filtro por dueDate si viene como query param
         if (dueDate) {
             const startOfDay = new Date(dueDate);
             startOfDay.setHours(0, 0, 0, 0);
@@ -72,14 +76,28 @@ const obtenerTareas = async (req, res) => {
         console.log('Orden aplicado en obtenerTareas:', ordenamiento);
 
         const tareas = await Tarea.findAll({
-            where: { usuarioId },
+            where: filtros,
             order: ordenamiento,
         });
+
 
         res.json(tareas);
     } catch (error) {
         console.error('Error al obtener tareas:', error);
         res.status(500).json({ mensaje: 'Error al obtener tareas.', error });
+    }
+};
+
+const obtenerTareaPorId = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const tarea = await Tarea.findByPk(id);  // o el método que uses para buscar
+        if (!tarea) {
+            return res.status(404).json({ mensaje: 'Tarea no encontrada' });
+        }
+        res.json(tarea);
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al obtener tarea', error: error.message });
     }
 };
 
@@ -243,4 +261,6 @@ module.exports = {
     buscarTareas,
     filtrarTareasPorEstado,
     filtrarTareasAvanzado,
+    obtenerTareaPorId,
+
 };

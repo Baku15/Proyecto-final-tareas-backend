@@ -49,22 +49,21 @@ const iniciarSesion = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Verificamos si el usuario existe
         const usuario = await Usuario.findOne({ where: { email } });
         if (!usuario) {
             return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
         }
 
-        // Verificamos la contraseña
         const passwordValida = await bcrypt.compare(password, usuario.password);
         if (!passwordValida) {
             return res.status(401).json({ mensaje: 'Contraseña incorrecta.' });
         }
 
-        // Creamos el token JWT
         const token = jwt.sign({ id: usuario.id, name: usuario.name }, process.env.JWT_SECRET, {
             expiresIn: '2h',
         });
+
+        console.log('Login exitoso:', { usuario: usuario.email, token });  // <-- LOG
 
         res.json({
             mensaje: 'Inicio de sesión exitoso.',
@@ -72,9 +71,11 @@ const iniciarSesion = async (req, res) => {
             usuario: { id: usuario.id, name: usuario.name, email: usuario.email },
         });
     } catch (error) {
+        console.error('Error en login:', error);
         res.status(500).json({ mensaje: 'Error al iniciar sesión.', error });
     }
 };
+
 
 const obtenerUsuario = async (req, res) => {
     try {
