@@ -11,4 +11,8 @@ app.use(express.json());
 app.use("/api/auth", rutasUsuario);
 app.use("/api/tasks", rutasTarea);
 
+app.get('/', (req, res) => {
+    res.send('Backend de Proyecto Final funcionando correctamente 🚀');
+});
+
 module.exports = app; // Exportar solo la app, sin iniciar el servidor aquí
